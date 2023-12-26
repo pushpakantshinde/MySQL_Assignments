@@ -102,22 +102,26 @@ foreign key(product_id) references Product(product_id));
 insert into Product values (1, 'S8', 1000), (2, 'G4', 800), (3, 'iphone', 1400);
 insert into Sales values (1, 1, 1, '2019-01-21', 2, 2000), (1, 2, 2, '2019-02-17', 1, 800), (2, 2, 3, '2019-06-02', 1, 800), (3, 3, 4, '2019-05-13', 2, 2800);
 
-select * from Product;
-select * from Sales;
+# Q17 solution 1
 
-/*drop table Product; 
-drop table Sales;*/
-
-(select p.product_id, p.product_name, s.sale_date 
+select p.product_id, p.product_name 
 FROM Product as p 
 INNER JOIN Sales as s on p.product_id = s.product_id
-where s.sale_date >= '2019-01-01' and s.sale_date <= '2019-03-31')
-except
-(select p.product_id, p.product_name, s.sale_date 
+where s.sale_date >= '2019-01-01' and s.sale_date <= '2019-03-31'
+and p.product_id not in
+(select p.product_id 
 FROM Product as p 
 INNER JOIN Sales as s on p.product_id = s.product_id
 where s.sale_date < '2019-01-01' or s.sale_date > '2019-03-31');
 
-select Product.product_id, Product.product_name 
-FROM Product
-INNER JOIN Sales on Product.product_id = Sales.product_id;
+# Q17 solution 2
+select p.product_id, p.product_name 
+FROM Product as p 
+INNER JOIN Sales as s on p.product_id = s.product_id
+where s.sale_date >= '2019-01-01' and s.sale_date <= '2019-03-31'
+and p.product_id not in
+(select product_id 
+FROM Sales as s 
+where s.sale_date < '2019-01-01' or s.sale_date > '2019-03-31');
+
+
