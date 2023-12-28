@@ -264,3 +264,256 @@ group by m.movie_id) t2
 where r2 = 1);
 
 # Q36
+select u.name, coalesce(sum(r.distance),0) as travelled_distance 
+from users u 
+left join rides r on u.id = r.user_id 
+group by u.name 
+order by travelled_distance desc, u.name;
+
+# Q37
+select u.unique_id, e.name 
+from employees e 
+left join employeeUNI u on e.id = u.id;
+
+# Q38
+select id, name 
+from Students 
+where department_id not in (select id from Departments);
+
+# Q39
+select t.person1, t.person2, count(*) as call_count, sum(t.duration) as total_duration 
+from 
+(select duration, case when from_id < to_id then from_id else to_id end as person1, 
+case when from_id > to_id then from_id else to_id end as person2 
+from Calls) t 
+group by t.person1, t.person2;
+
+# Q40
+select p.product_id, round(sum(u.units*p.price)/sum(u.units),2) as average_price 
+from prices p 
+left join unitssold u on p.product_id = u.product_id 
+where u.purchase_date >= start_date and u.purchase_date <= end_date 
+group by product_id 
+order by product_id;
+
+# Q41
+select w.name as warehouse_name, sum(p.width*p.length*p.height*w.units) as volume 
+from warehouse w 
+left join products p on w.product_id = p.product_id 
+group by w.name 
+order by w.name;
+
+# Q42
+select t.sale_date, (t.apples_sold - t.oranges_sold) as diff 
+from 
+(select sale_date, 
+max(CASE WHEN fruit = 'apples' THEN sold_num ELSE 0 END )as apples_sold, 
+max(CASE WHEN fruit = 'oranges' THEN sold_num ELSE 0 END )as oranges_sold 
+from sales 
+group by sale_date) t 
+order by t.sale_date;
+
+# Q43
+select round(t.player_id/(select count(distinct player_id) from activity),2) as fraction 
+from 
+(select distinct player_id, datediff(event_date, lead(event_date, 1) over(partition by player_id order by event_date)) as diff 
+from activity) t 
+where diff = -1;
+
+# Q44
+select t.name 
+from 
+(select a.id, a.name, count(b.managerID) as no_of_direct_reports 
+from employee a INNER JOIN employee b on a.id = b.managerID 
+group by b.managerID) t 
+where no_of_direct_reports >= 5 
+order by t.name;
+
+# Q45
+select d.dept_name, count(s.dept_id) as student_number 
+from department d 
+left join student s on s.dept_id = d.dept_id 
+group by d.dept_id 
+order by student_number desc, dept_name;
+
+# Q47
+select t.project_id, t.employee_id 
+from 
+(select p.project_id, e.employee_id, dense_rank() over(partition by p.project_id order by e.experience_years desc) as r 
+from project p 
+left join employee e on p.employee_id = e.employee_id) t 
+where r = 1 
+order by t.project_id;
+
+# Q48
+select t1.book_id, t1.name 
+from
+((select book_id, name 
+from Books 
+where available_from < '2019-05-23') t1 
+left join 
+(select book_id, sum(quantity) as quantity 
+from Orders 
+where dispatch_date > '2018-06-23' and dispatch_date<= '2019-06-23' 
+group by book_id 
+having quantity < 10) t2 on t1.book_id = t2.book_id );
+
+# Q49
+select t.student_id, t.course_id, t.grade 
+from 
+(select student_id, course_id, grade, dense_rank() over(partition by student_id order by grade desc, course_id) as r 
+from enrollments) t 
+where r = 1 
+order by t.student_id;
+
+# Q50
+select t2.group_id, t2.player_id 
+from 
+(select t1.group_id, t1.player_id, dense_rank() over(partition by group_id order by score desc, player_id) as r 
+from 
+(select p.*, 
+case when p.player_id = m.first_player then m.first_score 
+when p.player_id = m.second_player then m.second_score end as score 
+from Players p, Matches m 
+where player_id in (first_player, second_player) ) t1 ) t2 
+where r = 1;
+
+# Q51
+
+
+
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
+# Q46
