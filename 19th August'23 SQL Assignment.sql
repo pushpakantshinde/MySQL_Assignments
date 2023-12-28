@@ -379,27 +379,177 @@ where player_id in (first_player, second_player) ) t1 ) t2
 where r = 1;
 
 # Q51
+select name, population, area 
+from World 
+where area >= 3000000 or population >= 25000000;
+
+# Q52
+select name 
+from Customer 
+where refree_id != 2 or refree_id is NULL;
+
+# Q53
+select c.name 
+from Customers c 
+left join Orders o on c.id = o.customerID 
+where o.id is NULL;
+
+# Q54
+select employee_id, count(team_id) over(partition by team_id) as team_size 
+from Employee order by employee_id;
+
+# Q55
+select t3.Name 
+from 
+(select t2.Name, 
+avg(t1.duration) over(partition by t2.Name) as avg_call_duration, 
+avg(t1.duration) over() as global_average 
+from
+((select cl.caller_id as id, cl.duration from Calls cl) 
+union 
+(select cl.callee_id as id, cl.duration from Calls cl)) t1 
+left join 
+(select p.id, c.Name 
+from Person p 
+left join Country c ON cast(left(p.phone_number,3) as int) = cast(c.country_code as int)) t2 on t1.id = t2.id) t3 
+where t3.avg_call_duration > global_average 
+group by t3.Name;
 
 
+# Q56
+select t.player_id, t.device_id 
+from 
+(select player_id, device_id, row_number() over(partition by player_id order by event_date) as num 
+from activity)t 
+where t.num = 1;
 
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
+# Q57 - 1 
+select customer_number 
+from Orders 
+group by customer_number 
+order by count(order_number) desc limit 1;
+
+# Q57- 2
+select t.customer_number 
+from 
+(select customer_number, dense_rank() over(order by count(order_number) desc) as r 
+from Orders 
+group by customer_number) t 
+where t.r = 1;
+
+
+# Q58
+select t.seat_id 
+from (select seat_id, lead(seat_id,1,seat_id) over(order by seat_id) as next 
+from Cinema where Free != 0 ) t 
+where next - seat_id in (0,1) 
+order by seat_id;
+
+
+# Q59
+select Name 
+from SalesPerson 
+where sales_id not in (select o.sales_id from Orders o 
+left join Company c on o.com_id = c.com_id 
+where c.Name = 'Red');
+
+
+# Q60
+select X, Y, Z, (case when X+Y > Z and Y+Z > X and Z+X > Y then 'Yes' else 'No' end) as triangle 
+from Triangle;
+
+
+# Q61
+select min(t.diff) as shortest 
+from 
+(select lead(X,1) over(order by X) - X as diff 
+from Point) t;
+
+
+# Q62
+select actor_id, director_id 
+from ActorDirector 
+group by actor_id, director_id 
+having count(*) >= 3;
+
+
+# Q63
+select p.product_name, s.year, sum(price) as price 
+from Sales s 
+left join Product p on s.product_id = p.product_id 
+group by p.product_name, s.year;
+
+
+# Q64
+select p.project_id, round(avg(e.experience_years),2) as average_years 
+from Project p 
+left join Employee e on p.employee_id = e.employee_id 
+group by p.project_id;
+
+
+# Q65
+select t.seller_id from (select seller_id , sum(price), dense_rank() over(order by sum(price) desc) as r 
+from Sales 
+group by seller_id) t 
+where t.r = 1;
+
+
+# Q66
+select buyer_id 
+from 
+(select t1.buyer_id, 
+sum(case when t1.product_name = 'S8' then 1 else 0 end) as S8_count, 
+sum(case when t1.product_name = 'iPhone' then 1 else 0 end) as iphone_count 
+from 
+(select s.buyer_id, p.product_name 
+from Sales s 
+left join Product p on s.product_id = p.product_id ) t1 
+group by t1.buyer_id ) t2 
+where t2.S8_count = 1 and t2.iphone_count = 0;
+
+
+# Q67
+select t2.visited_on, t2.amount, t2.average_amount 
+from 
+(select t1.visited_on, 
+t1.prev_date_interval_6, 
+round(sum(amount) over(order by visited_on range between interval '6' day preceding and current row),2) as amount, 
+round(avg(amount) over(order by visited_on range between interval '6' day preceding and current row),2) as average_amount 
+from 
+(select visited_on, sum(amount) as amount, lag(visited_on,6) over(order by visited_on) as prev_date_interval_6 
+from Customer 
+group by visited_on 
+order by visited_on) t1 ) t2 
+where prev_date_interval_6 is not null;
+
+
+# Q68
+select gender, day, sum(score_points) over(partition by gender order by day) as total 
+from Scores 
+group by gender, day 
+order by gender, day;
+
+
+# Q69
+select distinct start.log_id as start_id, min(end.log_id) over(partition by start.log_id) as end_id 
+from 
+(select log_id 
+from Logs 
+where log_id - 1 not in (select * from Logs)) 
+start, 
+(select log_id from Logs where log_id + 1 not in (select * from Logs)) end 
+where start.log_id <= end.log_id;
+
+# Q70
+select t.student_id, t.student_name , t.subject_name, count(e.subject_name) as attended_exams 
+from 
+(select student_id, student_name, subject_name 
+from Students, Subjects) t 
+left join Examinations e on t.student_id = e.student_id and t.subject_name = e.subject_name 
+group by t.student_id, t.subject_name 
+order by t.student_id, t.subject_name;
+
+
 # Q46
 # Q46
 # Q46
