@@ -550,27 +550,266 @@ group by t.student_id, t.subject_name
 order by t.student_id, t.subject_name;
 
 
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
+# Q71
+with recursive new as 
+( 
+	select employee_id 
+    from Employees 
+    where employee_id = 1 
+    union 
+    select e2.employee_id 
+    from new e1 
+    inner join Employees e2 on e1.employee_id = e2.manager_id 
+) 
+select * 
+from new 
+where employee_id <> 1;
+
+
+# Q72
+select month(trans_date) as Month, 
+Country, count(Id) as trans_count, 
+sum(case when State = 'approved' then 1 else 0 end) as approved_count, 
+sum(amount) as trans_total_amount, 
+sum(case when State = 'approved' then amount else 0 end) as approved_total_amount 
+from Transactions 
+group by Month, Country;
+
+
+# Q73
+select round(avg(t.daily_percent), 2) as average_daily_percent 
+from 
+(select sum(case when remove_date > action_date then 1 else 0 end)/ count(tmp.action_date)*100 as daily_percent 
+from 
+(select post_id, action_date, extra 
+from Actions 
+where extra = 'spam') tmp 
+left join Removals r on tmp.post_id = r.post_id 
+group by action_date) t;
+
+
+# 74
+select round(t.player_id/(select count(distinct player_id) from activity),2) as fraction 
+from 
+(select distinct player_id, 
+datediff(event_date, 
+lead(event_date, 1) over(partition by player_id order by event_date)) as diff 
+from activity) t 
+where diff = -1;
+
+
+# Q75
+select round(t.player_id/(select count(distinct player_id) from activity),2) as fraction 
+from 
+(select distinct player_id, 
+datediff(event_date, lead(event_date, 1) over(partition by player_id order by event_date)) as diff 
+from activity )t 
+where diff = -1;
+
+
+# Q76
+select company_id, 
+employee_id, employee_name, 
+(case when max(salary) over(partition by company_id) < 1000 then salary 
+when max(salary) over(partition by company_id) < 10000 then round(0.76*salary) 
+else round(0.51*salary) end) as Salary
+ from Salaries;
+
+
+# Q77
+select t.left_operand, t.operator, t.right_operand, 
+(case when t.value > v2.value and operator = '>' then "true" 
+when t.value < v2.value and operator = '<' then "true" 
+when t.value = v2.value and operator = '=' then "true" else "false" end) as value 
+from
+(select e.*, v1.value 
+from Expressions e 
+inner join Variables v1 on e.left_operand = v1.name) t 
+inner join Variables v2 on t.right_operand = v2.name;
+
+
+# Q78
+select t3.Name 
+from 
+(select t2.Name, avg(t1.duration) over(partition by t2.Name) as avg_call_duration, 
+avg(t1.duration) over() as global_average 
+from 
+((select cl.caller_id as id, cl.duration 
+from Calls cl) 
+union 
+(select cl.callee_id as id, cl.duration 
+from Calls cl)) t1 left join 
+(select p.id, c.Name 
+from Person p 
+left join Country c on cast(left(p.phone_number,3) as int) = cast(c.country_code as int)) t2 on t1.id = t2.id) t3 
+where t3.avg_call_duration > global_average 
+group by t3.Name;
+
+
+# Q79
+select name from Employee order by name;
+
+
+# Q80
+select year, 
+product_id, curr_year_spend, 
+coalesce(prev_year_spend,'') as prev_year_spend, 
+coalesce(round((curr_year_spend - prev_year_spend)/prev_year_spend *100,2),'') as yoy_rate 
+from 
+(select year(transaction_date) as year, 
+product_id, spend as curr_year_spend, 
+round(lag(spend,1) over(partition by product_id order by transaction_date),2) as prev_year_spend 
+from user_transactions )t;
+
+
+# Q81
+select item_type, 
+(case 
+when item_type = 'prime_eligible' then floor(500000/sum(square_footage)) * count(item_type) 
+when item_type = 'not_prime' then floor((500000 -(select floor(500000/sum(square_footage)) * sum(square_footage) 
+from inventory 
+where item_type = 'prime_eligible'))/sum(square_footage)) * count(item_type) end) as item_count 
+from inventory 
+group by item_type 
+order by count(item_type) desc;
+
+
+# Q82 - Solution: For July Month
+select month(a.event_date) as month, 
+count(distinct a.user_id) as monthly_active_users 
+from user_actions a 
+inner join user_actions b on concat(month(a.event_date),year(a.event_date)) = concat(1+month(b.event_date),year(b.event_date)) and a.user_id = b.user_id 
+where a.event_type in ('sign-in', 'like', 'comment') and b.event_type in ('sign-in', 'like', 'comment') and concat(month(a.event_date),'/',year(a.event_date)) = '7/2022' and concat(1+month(b.event_date),'/',year(b.event_date)) = '7/2022' 
+group by month(a.event_date);
+
+
+# Q82 - Solution: For June Month
+select month(a.event_date) as month, 
+count(distinct a.user_id) as monthly_active_users 
+from user_actions a inner join user_actions b on concat(month(a.event_date),year(a.event_date)) = concat(1+month(b.event_date),year(b.event_date)) and a.user_id = b.user_id 
+where a.event_type in ('sign-in', 'like', 'comment') and b.event_type in ('sign-in', 'like', 'comment') and concat(month(a.event_date),'/',year(a.event_date)) = '6/2022' and concat(1+month(b.event_date),'/',year(b.event_date)) = '6/2022' 
+group by month(a.event_date);
+
+
+# Q83 - Solution: using recursive cte
+with recursive seq as 
+( 
+	select searches, num_users, 1 as c 
+    from search_frequency 
+    union 
+    select searches, num_users, c+1 
+    from seq where c < num_users 
+) 
+select round(avg(t.searches),1) as median 
+from
+(select searches,row_number() over(order by searches, c) as r1, row_number() over(order by searches desc, c desc) as r2 
+from seq order by searches) t where t.r1 in (t.r2, t.r2 - 1, t.r2 + 1);
+
+
+# Q83 - Solution: using cumulative sum
+select round(avg(t1.searches),1) as median 
+from 
+(select t.searches, t.cumm_sum, 
+lag(cumm_sum,1,0) over(order by searches) as prev_cumm_sum, 
+case when total % 2 = 0 then total/2 else (total+1)/2 end as pos1, 
+case when total % 2 = 0 then (total/2)+1 else (total+1)/2 end as pos2 
+from 
+(select searches, num_users, 
+sum(num_users) over(order by searches rows between unbounded preceding and current row) as cumm_sum, 
+sum(num_users) over(order by searches rows between unbounded preceding and unbounded following) as total 
+from search_frequency) t ) t1 
+where (t1.pos1 > t1.prev_cumm_sum and t1.pos1 <= t1.cumm_sum) or (t1.pos2 > t1.prev_cumm_sum and t1.pos2 <= t1.cumm_sum);
+
+
+# Q84
+select user_id, 
+case when status in ('NEW','EXISTING','CHURN','RESURRECT') and user_id not in (select user_id from daily_pay) then 'CHURN' 
+when status in ('NEW','EXISTING','RESURRECT') and user_id in (select user_id from daily_pay) then 'EXISTING' 
+when status = 'CHURN' and user_id in (select user_id from daily_pay) then 'RESURRECT' end as new_status
+from advertiser order by user_id;
+
+
+# Q85
+select sum(t.individual_uptime) as total_uptime_days 
+from 
+(select case when session_status = 'stop' then timestampdiff(day, lag(status_time) over(partition by server_id order by status_time), status_time) end as individual_uptime 
+from server_utilization ) t;
+
+
+# Q86
+select sum(case when (unix_timestamp(t.next_transaction) - unix_timestamp(t.transaction_timestamp))/60 <= 10 then 1 else 0 end) as payment_count 
+from 
+(select transaction_timestamp, lead(transaction_timestamp,1) over(partition by merchant_id, credit_card_id, Amount 
+order by transaction_timestamp) as next_transaction 
+from transactions)t;
+
+
+# Q87
+select round(avg(t1.bad_exp_pct_per_cust),2) as bad_exp_pct 
+from 
+(select t.customer_id, 100*sum(case when o.status <> 'completed successfully' then 1 else 0 end)/count(*) as bad_exp_pct_per_cust 
+from
+(select customer_id, signup_timestamp 
+from customers 
+where month(signup_timestamp) = 6 ) t 
+inner join orders o on o.customer_id = t.customer_id 
+where timestampdiff(day, t.signup_timestamp, o.order_timestamp) <= 13 
+group by t.customer_id) t1;
+
+
+# Q88
+select gender, day, sum(score_points) over(partition by gender order by day) as total 
+from Scores 
+group by gender, day 
+order by gender, day;
+
+
+# Q89
+select t3.Name 
+from 
+(select t2.Name, 
+avg(t1.duration) over(partition by t2.Name) as avg_call_duration, avg(t1.duration) over() as global_average 
+from 
+((select cl.caller_id as id, cl.duration from Calls cl) 
+union 
+(select cl.callee_id as id, cl.duration from Calls cl)) t1 
+left join 
+(select p.id, c.Name 
+from Person p left join Country c on cast(left(p.phone_number,3) as int) = cast(c.country_code as int)) t2 on t1.id = t2.id) t3 
+where t3.avg_call_duration > global_average 
+group by t3.Name;
+
+
+# Q90 - Solution: using recursive cte 
+with recursive seq as 
+( 
+	select num, frequency, 1 as c 
+    from Numbers 
+    union 
+    select num, frequency, c+1 
+    from seq 
+    where c < frequency ) 
+    select round(avg(t.num),1) as median 
+    from 
+    (select num,row_number() over(order by num, c) as r1, row_number() over(order by num desc, c desc) as r2 from seq order by num ) t 
+    where t.r1 in (t.r2, t.r2 - 1,t.r2 + 1);
+
+# Q90 - Solution: using cumulative sum 
+select round(avg(t1.num),1) as median 
+from 
+(select t.num, t.cumm_sum, 
+lag(cumm_sum,1,0) over(order by num) as prev_cumm_sum, 
+case when total % 2 = 0 then total/2 else (total+1)/2 end as pos1, 
+case when total % 2 = 0 then (total/2)+1 else (total+1)/2 end as pos2 
+from 
+(select num, frequency, 
+sum(frequency) over(order by num rows between unbounded preceding and current row) as cumm_sum, 
+sum(frequency) over(order by num rows between unbounded preceding and unbounded following) as total
+from Numbers) t ) t1 
+where (t1.pos1 > t1.prev_cumm_sum and t1.pos1 <= t1.cumm_sum) or (t1.pos2 > t1.prev_cumm_sum and t1.pos2 <= t1.cumm_sum);
+
+
+
 # Q46
 # Q46
 # Q46
