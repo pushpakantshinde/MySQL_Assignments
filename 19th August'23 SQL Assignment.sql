@@ -18,17 +18,22 @@ select count(*) from city;
 # Q1
 select * from city where countrycode = "USA" and population>100000;
 
+
 # Q2
 select * from city where countrycode = "USA" and population>120000;
+
 
 # Q3
 select * from city;
 
+
 # Q4
 select * from city where id = 1661;
 
+
 # Q5
 select * from city where countrycode = "JPN";
+
 
 # Q6
 select name from city where countrycode = "JPN";
@@ -46,11 +51,14 @@ describe station;
 # Q7
 select city, state from station;
 
+
 # Q8
 select distinct city from station where id%2 = 0;
 
+
 # Q9
 select (count(city) - count(distinct city)) as 'city_count-dist_city_count' from station;
+
 
 # Q10
 (select city, length(city) as length
@@ -67,23 +75,28 @@ order by length(city) desc, city asc limit 1);
 # Q11
 select distinct city from station where left(city,1) in ('a', 'e', 'i', 'o', 'u');
 
+
 # Q12
 select distinct city from station where right(city,1) in ('a', 'e', 'i', 'o', 'u');
+
 
 # Q13
 select distinct city from station where left(city,1) not in ('a', 'e', 'i', 'o', 'u');
 
+
 # Q14
 select distinct city from station where right(city,1) not in ('a', 'e', 'i', 'o', 'u');
+
 
 # Q15
 select distinct city from station where (left(city,1) not in ('a', 'e', 'i', 'o', 'u')) or right(city,1) not in ('a', 'e', 'i', 'o', 'u');
 
+
 # Q16
 select distinct city from station where (left(city,1) not in ('a', 'e', 'i', 'o', 'u')) and right(city,1) not in ('a', 'e', 'i', 'o', 'u');
 
-# Q17
 
+# Q17
 create table Product
 (product_id int,
 product_name varchar(20),
@@ -131,12 +144,14 @@ from views
 where author_id = viewer_id 
 order by author_id asc;
 
+
 # Q19
 select round(
 (select count(*) 
 from delivery 
 where order_date = customer_pref_delivery_date)/count(*)*100,2) as immediate_percentage 
 from delivery;
+
 
 # Q20
 select t.ad_id, (case when base != 0 then round(t.num/t.base*100,2) else 0 end) as Ctr 
@@ -146,10 +161,12 @@ from ads
 group by ad_id)t 
 order by Ctr desc, t.ad_id asc;
 
+
 # Q21
 select employee_id, count(team_id) over (partition by team_id) as team_size 
 from employee
 order by employee_id;
+
 
 # Q22
 select c.country_name, 
@@ -161,6 +178,7 @@ left join weather w on c.country_id = w.country_id
 where month(day) = 11 
 group by c.country_name;
 
+
 # Q23
 select p.product_id, round(sum(u.units*p.price)/sum(u.units),2) as average_price 
 from prices p 
@@ -169,6 +187,7 @@ where u.purchase_date >= start_date and u.purchase_date <= end_date
 group by product_id 
 order by product_id;
 
+
 # Q24
 select t.player_id, event_date as first_login 
 from 
@@ -176,12 +195,14 @@ from
 from activity)t 
 where t.num = 1;
 
+
 # Q25
 select t.player_id, t.device_id 
 from 
 (select player_id, device_id, row_number() over(partition by player_id order by event_date) as num 
 from activity)t 
 where t.num = 1;
+
 
 # Q26
 select p.product_name, sum(o.unit) as unit 
@@ -191,11 +212,13 @@ where month(o.order_date) = 2 and year(o.order_date) = 2020
 group by p.product_id 
 having unit >= 100;
 
+
 # Q27
 select user_id, name, mail 
 from Users 
 where mail regexp '^[a-zA-Z]+[a-zA-Z0-9_\.\-]*@leetcode[\.]com' 
 order by user_id;
+
 
 # Q28
 select t.customer_id, t.name 
@@ -209,26 +232,31 @@ left join Customers c on o.customer_id = c.customer_id
 group by c.customer_id) t 
 where june_spent >= 100 and july_spent >= 100;
 
+
 # Q29
 select c.Title 
 from Content c 
 left join TVProgram t on c.content_id = t.content_id 
 where c.Kids_content = 'Y' and c.content_type = 'Movies' and month(t.program_date) = 6 and year(t.program_date) = 2020;
 
+
 # Q30
 select q.*, coalesce(n.Npv,0) as Npv 
 from Queries q 
 left join NPV n on q.Id = n.Id and q.Year = n.Year;
+
 
 # Q31
 select q.*, coalesce(n.Npv,0) as Npv 
 from Queries q 
 left join NPV n on q.Id = n.Id and q.Year = n.Year;
 
+
 # Q32
 select u.unique_id, e.name 
 from employees e 
 left join employeeUNI u on e.id = u.id;
+
 
 # Q33
 select u.name, coalesce(sum(r.distance),0) as travelled_distance 
@@ -237,6 +265,7 @@ left join rides r on u.id = r.user_id
 group by u.name 
 order by travelled_distance desc, u.name;
 
+
 # Q34
 select p.product_name, sum(o.unit) as unit 
 from Products p 
@@ -244,6 +273,7 @@ left join Orders o on p.product_id = o.product_id
 where month(o.order_date) = 2 and year(o.order_date) = 2020 
 group by p.product_id 
 having unit >= 100;
+
 
 # Q35
 (select t1.name as Results 
@@ -263,6 +293,7 @@ where month(m.created_at) = 2 and year(m.created_at) = 2020
 group by m.movie_id) t2 
 where r2 = 1);
 
+
 # Q36
 select u.name, coalesce(sum(r.distance),0) as travelled_distance 
 from users u 
@@ -270,15 +301,18 @@ left join rides r on u.id = r.user_id
 group by u.name 
 order by travelled_distance desc, u.name;
 
+
 # Q37
 select u.unique_id, e.name 
 from employees e 
 left join employeeUNI u on e.id = u.id;
 
+
 # Q38
 select id, name 
 from Students 
 where department_id not in (select id from Departments);
+
 
 # Q39
 select t.person1, t.person2, count(*) as call_count, sum(t.duration) as total_duration 
@@ -288,6 +322,7 @@ case when from_id > to_id then from_id else to_id end as person2
 from Calls) t 
 group by t.person1, t.person2;
 
+
 # Q40
 select p.product_id, round(sum(u.units*p.price)/sum(u.units),2) as average_price 
 from prices p 
@@ -296,12 +331,14 @@ where u.purchase_date >= start_date and u.purchase_date <= end_date
 group by product_id 
 order by product_id;
 
+
 # Q41
 select w.name as warehouse_name, sum(p.width*p.length*p.height*w.units) as volume 
 from warehouse w 
 left join products p on w.product_id = p.product_id 
 group by w.name 
 order by w.name;
+
 
 # Q42
 select t.sale_date, (t.apples_sold - t.oranges_sold) as diff 
@@ -313,12 +350,14 @@ from sales
 group by sale_date) t 
 order by t.sale_date;
 
+
 # Q43
 select round(t.player_id/(select count(distinct player_id) from activity),2) as fraction 
 from 
 (select distinct player_id, datediff(event_date, lead(event_date, 1) over(partition by player_id order by event_date)) as diff 
 from activity) t 
 where diff = -1;
+
 
 # Q44
 select t.name 
@@ -329,12 +368,14 @@ group by b.managerID) t
 where no_of_direct_reports >= 5 
 order by t.name;
 
+
 # Q45
 select d.dept_name, count(s.dept_id) as student_number 
 from department d 
 left join student s on s.dept_id = d.dept_id 
 group by d.dept_id 
 order by student_number desc, dept_name;
+
 
 # Q47
 select t.project_id, t.employee_id 
@@ -344,6 +385,7 @@ from project p
 left join employee e on p.employee_id = e.employee_id) t 
 where r = 1 
 order by t.project_id;
+
 
 # Q48
 select t1.book_id, t1.name 
@@ -358,6 +400,7 @@ where dispatch_date > '2018-06-23' and dispatch_date<= '2019-06-23'
 group by book_id 
 having quantity < 10) t2 on t1.book_id = t2.book_id );
 
+
 # Q49
 select t.student_id, t.course_id, t.grade 
 from 
@@ -365,6 +408,7 @@ from
 from enrollments) t 
 where r = 1 
 order by t.student_id;
+
 
 # Q50
 select t2.group_id, t2.player_id 
@@ -378,15 +422,18 @@ from Players p, Matches m
 where player_id in (first_player, second_player) ) t1 ) t2 
 where r = 1;
 
+
 # Q51
 select name, population, area 
 from World 
 where area >= 3000000 or population >= 25000000;
 
+
 # Q52
 select name 
 from Customer 
 where refree_id != 2 or refree_id is NULL;
+
 
 # Q53
 select c.name 
@@ -394,9 +441,11 @@ from Customers c
 left join Orders o on c.id = o.customerID 
 where o.id is NULL;
 
+
 # Q54
 select employee_id, count(team_id) over(partition by team_id) as team_size 
 from Employee order by employee_id;
+
 
 # Q55
 select t3.Name 
@@ -423,11 +472,13 @@ from
 from activity)t 
 where t.num = 1;
 
+
 # Q57 - 1 
 select customer_number 
 from Orders 
 group by customer_number 
 order by count(order_number) desc limit 1;
+
 
 # Q57- 2
 select t.customer_number 
@@ -809,100 +860,112 @@ from Numbers) t ) t1
 where (t1.pos1 > t1.prev_cumm_sum and t1.pos1 <= t1.cumm_sum) or (t1.pos2 > t1.prev_cumm_sum and t1.pos2 <= t1.cumm_sum);
 
 
+# Q91
+select distinct 
+concat(year(t.pay_date),'-',month(t.pay_date)) as pay_month, t.department_id, 
+case when monthly_department_avg_salary > monthly_average_salary then 'higher' 
+when monthly_department_avg_salary < monthly_average_salary then 'lower' 
+else 'same' end as Comparison 
+from 
+(select s.pay_date, e.department_id, 
+avg(s.amount) over(partition by month(s.pay_date), 
+e.department_id) as monthly_department_avg_salary, 
+avg(s.amount) over(partition by month(s.pay_date)) as monthly_average_salary 
+from Salary s 
+left join Employee e on s.employee_id = e.employee_id) t 
+order by t.department_id;
 
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
-# Q46
+
+# Q92
+select t1.install_dt, 
+count(player_id) as installs, 
+round(count(t1.next_install)/count(t1.player_id),2) as Day1_retention 
+from 
+(select t.player_id, t.install_dt, a.event_date as next_install 
+from
+(select player_id, min(event_date) as install_dt 
+from Activity group by player_id ) t 
+left join Activity a on t. player_id = a.player_id and a.event_date = t.install_dt + 1) t1 
+group by install_dt;
+
+
+# Q93
+select t2.group_id, t2.player_id 
+from 
+(select t1.group_id, t1.player_id, dense_rank() over(partition by group_id order by score desc, player_id) as r 
+from 
+(select p.*, 
+case when p.player_id = m.first_player then m.first_score 
+when p.player_id = m.second_player then m.second_score end as score 
+from Players p, Matches m 
+where player_id in (first_player, second_player) ) t1 ) t2 
+where r = 1;
+
+
+# Q94
+select t.student_id, t.student_name 
+from 
+(select s.student_name, s.student_id, count(e.student_id) over(partition by student_name) as exams_given, 
+case when e.score > min(e.score) over(partition by e.exam_id) and e.score < max(e.score) over(partition by e.exam_id) then 1 
+else 0 end as quiet 
+from Exam e 
+left join Student s on e.student_id = s.student_id)t 
+group by t.student_name, t.student_id, t.exams_given 
+having sum(t.quiet) = t.exams_given;
+
+
+# Q95
+select t.student_id, t.student_name 
+from 
+(select s.student_name, s.student_id, count(e.student_id) over(partition by student_name) as exams_given, 
+case when e.score > min(e.score) over(partition by e.exam_id) and e.score < max(e.score) over(partition by e.exam_id) then 1 
+else 0 end as quiet 
+from Exam e 
+left join Student s on e.student_id = s.student_id)t 
+group by t.student_name, t.student_id, t.exams_given 
+having sum(t.quiet) = t.exams_given;
+
+
+# Q96
+select t.user_id, t.song_id, sum(t.song_plays) as song_plays 
+from 
+(select user_id, song_id, song_plays 
+from songs_history 
+union 
+all select user_id, song_id, 1 as song_plays 
+from songs_weekly 
+where date(listen_time) <= '2022/08/04') t 
+group by user_id, song_id;
+
+
+# Q97
+select round(sum(case when t.signup_action = 'Confirmed' then 1 else 0 end)/count(*),2) as confirm_rate 
+from emails e 
+join texts t on e.email_id = t.email_id;
+
+
+# Q98
+select user_id, 
+date_format(tweet_date, '%m/%d/%Y %h:%i:%s') as tweet_date, 
+round(avg(count(distinct tweet_id)) over(order by tweet_date rows between 2 preceding and current row),2) as rolling_avg_3days 
+from tweets 
+group by user_id, tweet_date;
+
+
+# Q99
+select b.age_bucket, 
+round(100*sum(case when a.activity_type = 'Send' then a.time_spent else 0 end)/sum(a.time_spent),2) send_perc, 
+round(100*sum(case when a.activity_type = 'Open' then a.time_spent else 0 end)/sum(a.time_spent),2) open_perc 
+from activities a join age_breakdown b on a.user_id = b.user_id where activity_type in ('Open', 'Send') 
+group by b.age_bucket order by b.age_bucket;
+
+
+# Q100
+select p.profile_id 
+from personal_profiles p 
+join employee_company e on p.profile_id = e.personal_profile_id 
+join company_pages c on e.company_id = c.company_id 
+group by p.profile_id, p.followers 
+having p.followers > sum(c.followers) 
+order by profile_id;
+
